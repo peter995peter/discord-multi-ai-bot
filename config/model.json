@@ -1,0 +1,23 @@
+{
+    "api": {
+        "grok": {
+            "url": "https://api.x.ai/v1/chat/completions",
+            "key": ["IDontHaveMoney"]
+        },
+        "gemini": {
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "key": ["IDontHaveMoney"]
+        },
+        "openai": {
+            "url": "https://api.openai.com/v1/chat/completions",
+            "key": ["IDontHaveMoney"]
+        }
+    },
+    "models": {
+        "grok-beta": "grok",
+        "gemini-1.5-flash": "gemini",
+        "gemini-1.5-pro": "gemini",
+        "gpt-4o": "openai",
+        "gpt-4o-mini": "openai"
+    }
+}
