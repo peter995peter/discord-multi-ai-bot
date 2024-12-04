@@ -1,0 +1,6 @@
+{
+    "token": "Token",
+    "owner_name": "Rick Astley",
+    "prefix": "m@",
+    "default_model": "gemini-1.5-flash"
+}
