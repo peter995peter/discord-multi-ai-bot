@@ -2,8 +2,16 @@
 使用OpenAI API格式製作的多模型Discord聊天機器人
 
 ## 安裝教學
-1. 設定`config/config.json`
-2. 設定`config/model.json`
+1. 設定 `config/config.json`
+2. 設定 `config/model.json`
+3. 安裝必要套件:
+```
+pip install -r requirements.txt
+```
+4. 啟動機器人
+```
+python3 bot.py
+```
 
 ## 檔案設定
 > config/config.json
