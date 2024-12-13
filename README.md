@@ -3,6 +3,7 @@
 
 ## 安裝教學
 1. 設定`config/config.json`
+2. 設定`config/model.json`
 
 ## 檔案設定
 > config/config.json
@@ -18,3 +19,6 @@
 * `models`: "模型名稱": "api 提供者"(如果你沒有要新增模型基本上不用動）
 
 ## 取得API Key
+* [Gemini](https://aistudio.google.com/apikey)
+* [Grok](https://console.x.ai) 按鑰匙圖片的
+* [OpenAI](https://platform.openai.com/settings/organization/api-keys)
