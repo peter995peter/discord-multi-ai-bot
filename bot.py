@@ -19,6 +19,7 @@ with open("config/config.json") as file:
 @client.event
 async def on_ready():
     print(f"{client.user} online")
+    await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing, name=f"{prefix}help | 在{len(client.guilds)}個伺服器"))
 
 @client.event
 async def on_message(message):
