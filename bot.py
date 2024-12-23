@@ -7,7 +7,7 @@ import discord
 import random
 
 nl = "\n"
-client = discord.Client(allowed_mentions=discord.AllowedMentions(everyone=False,
+client = discord.Bot(intents=discord.Intents.all(),allowed_mentions=discord.AllowedMentions(everyone=False,
 users=True,
 roles=False,
 replied_user=True))
@@ -128,6 +128,122 @@ async def on_message(message):
                     np = prefix
                 await message.reply(f"出現問題，可能是撞到速率限制或者沒餘額了\n請嘗試使用`{np}set_model`更改模型 或使用`{np}reset`重置聊天紀錄\n\n-# 使用模型: {model}")
 
+@client.command(description="查看指令幫助") 
+async def help(ctx):
+    if type(ctx.channel) == discord.DMChannel: # 私訊
+        cl = {f"/help": "你正在看",f"/reset": "重置聊天紀錄(需要管理訊息權限)",f"/set_model (model_name)": "修改對話使用的模型(需要管理訊息權限)"}
+    elif os.path.exists(f"data/{ctx.channel.id}.json"):
+        cl = {f"/help": "你正在看",f"/reset": "重置聊天紀錄(需要管理訊息權限)",f"/unset": "取消設置該頻道為聊天頻道(需要管理訊息權限)",f"/set_model (model_name)": "修改對話使用的模型(需要管理訊息權限)"}
+    else:
+        cl = {f"/help": "你正在看",f"/set": "設置該頻道為聊天頻道(需要管理訊息權限)",f"/tag help": "查看@聊天的幫助"}
+    embed = await gen_help(cl)
+    await ctx.respond(embed=embed)
+
+@client.command(description="設定聊天頻道") 
+async def set(ctx): 
+    if type(ctx.channel) == discord.DMChannel: # 私訊
+        await ctx.respond("私訊不需要設定")
+    elif os.path.exists(f"data/{ctx.channel.id}.json"):
+        await ctx.respond("這頻道已經是聊天頻道了")
+    else:
+        if ctx.author.guild_permissions.manage_messages:
+            await history(ctx.channel.id)
+            await ctx.respond("已成功設定該頻道為聊天頻道")
+        else:
+            await ctx.respond("你需要有管理訊息權限")
+
+@client.command(description="重置聊天紀錄") 
+async def reset(ctx): 
+    if type(ctx.channel) == discord.DMChannel: # 私訊
+        async with aiofiles.open(f"data/dm-{ctx.author.id}.json", 'w') as file:
+            await file.write("[]")
+        await ctx.respond("已成功重置聊天記錄")
+    elif os.path.exists(f"data/{ctx.channel.id}.json"):
+        if ctx.author.guild_permissions.manage_messages:
+            async with aiofiles.open(f"data/{ctx.channel.id}.json", 'w') as file:
+                await file.write("[]")
+            await ctx.respond("已成功重置聊天記錄")
+        else:
+            await ctx.respond("你需要有管理訊息權限")
+    else:
+        await ctx.respond("這裡不是聊天頻道\n如果要重置@聊天的紀錄請使用`/tag reset`")
+
+@client.command(description="取消設定聊天頻道") 
+async def unset(ctx):
+    if os.path.exists(f"data/{ctx.channel.id}.json"):
+        if ctx.author.guild_permissions.manage_messages:
+            os.remove(f"data/{ctx.channel.id}.json")
+            await ctx.respond("已成功取消設定聊天頻道")
+        else:
+            await ctx.respond("你需要有管理訊息權限")
+    else:
+        await ctx.respond("這指令只能在有設定的頻道使用")
+
+with open("config/model.json") as file:
+    md = json.load(file)["models"]
+@client.command(description="設定聊天模型") 
+async def set_model(
+    ctx: discord.ApplicationContext, 
+    model: discord.Option(str, choices=list(md))
+):
+    if type(ctx.channel) == discord.DMChannel: # 私訊
+        async with aiofiles.open(f"data/model/dm-{ctx.author.id}.json", 'w') as file:
+            await file.write(json.dumps({"model": model}))
+        await ctx.respond(f"已成功更換模型至{model}")
+    elif os.path.exists(f"data/{ctx.channel.id}.json"):
+        if ctx.author.guild_permissions.manage_messages:
+            async with aiofiles.open(f"data/model/{ctx.channel.id}.json", 'w') as file:
+                await file.write(json.dumps({"model": model}))
+            await ctx.respond(f"已成功更換模型至{model}")
+        else:
+            await ctx.respond("你需要有管理訊息權限")
+    else:
+        await ctx.respond("這裡不是聊天頻道\n如果要設定@聊天的模型請使用`/tag set_model`")
+
+tag = discord.SlashCommandGroup("tag", "@聊天相關指令")
+
+@tag.command(description="查看指令幫助")
+async def help(ctx):
+    embed = await gen_help({f"/tag help": "你正在看",f"/tag reset": "重置聊天紀錄",f"/tag set_model (model_name)": "修改對話使用的模型"})
+    await ctx.respond(embed=embed)
+
+@tag.command(description="重置聊天紀錄") 
+async def reset(ctx): 
+    async with aiofiles.open(f"data/tag-{ctx.author.id}.json", 'w') as file:
+        await file.write("[]")
+    await ctx.respond("已成功重置聊天記錄")
+
+@tag.command(description="設定聊天模型") 
+async def set_model(
+    ctx: discord.ApplicationContext, 
+    model: discord.Option(str, choices=list(md))
+):
+    async with aiofiles.open(f"data/model/tag-{ctx.author.id}.json", 'w') as file:
+        await file.write(json.dumps({"model": model}))
+    await ctx.respond(f"已成功更換模型至{model}")
+
+client.add_application_command(tag)
+
+answer = discord.SlashCommandGroup("answer", "回覆問題相關指令")
+
+@answer.command(description="設定聊天模型") 
+async def set_model(
+    ctx: discord.ApplicationContext, 
+    model: discord.Option(str, choices=list(md))
+):
+    async with aiofiles.open(f"data/model/answer-{ctx.author.id}.json", 'w') as file:
+        await file.write(json.dumps({"model": model}))
+    await ctx.respond(f"已成功更換模型至{model}")
+
+client.add_application_command(answer)
+
+@client.message_command(name="回覆這問題")
+async def get_message_id(ctx, message: discord.Message):  # message commands return the message
+    em = await ctx.respond("回覆中")
+    ass = await send(f"answer-{ctx.user.id}", f"請在1750字內回答此問題:\n\n{message.content}")
+    model = await get_model(f"answer-{ctx.user.id}")
+    await em.edit(content=f"* 回覆[{message.author.display_name}]({message.jump_url})\n\n{ass['choices'][0]['message']['content']}\n\n-# 使用模型: {model['name']}")
+
 async def get_model(channel):
     with open(f"data/model/{channel}.json") as file:
         name = json.load(file)["model"]
@@ -172,7 +288,8 @@ async def send(channel, message):
             async with session.post(model["url"], headers=headers, json=prompt) as response:
                 if response.status == 200:
                     resd = await response.json()
-                    await log(channel, message, resd['choices'][0]['message']['content'])
+                    if not(channel.startswith("answer")):
+                        await log(channel, message, resd['choices'][0]['message']['content'])
                     #print(resd["usage"])
                     return resd
                 else:
