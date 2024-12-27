@@ -28,5 +28,5 @@ python3 bot.py
 
 ## 取得API Key
 * [Gemini](https://aistudio.google.com/apikey)
-* [Grok](https://console.x.ai) 按鑰匙圖片的
+* [Grok](https://console.x.ai)
 * [OpenAI](https://platform.openai.com/settings/organization/api-keys)
