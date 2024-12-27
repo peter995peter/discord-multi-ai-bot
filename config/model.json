@@ -2,11 +2,11 @@
     "api": {
         "grok": {
             "url": "https://api.x.ai/v1/chat/completions",
-            "key": ["xai-tbg6AmYP91GmfkqSmBJxwq6k24X4e301Eh3Qkj0oBDD62qS9cmZOmTJZ30GFtZnOpe7s3ZG6Lis2azgZ"]
+            "key": ["IDontHaveMoney"]
         },
         "gemini": {
             "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-            "key": ["AIzaSyDqZUq_E_PaX57rHRHFMmIGuIoyrx_avUI"]
+            "key": ["IDontHaveMoney"]
         },
         "openai": {
             "url": "https://api.openai.com/v1/chat/completions",
