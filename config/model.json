@@ -17,7 +17,8 @@
         "grok-beta": "grok",
         "gemini-1.5-flash": "gemini",
         "gemini-1.5-pro": "gemini",
-        "gemini-2.0-flash-exp": "gemini",
+        "gemini-2.0-flash": "gemini",
+        "gemini-2.5-flash-preview-05-20": "gemini",
         "gpt-4o": "openai",
         "gpt-4o-mini": "openai"
     }
